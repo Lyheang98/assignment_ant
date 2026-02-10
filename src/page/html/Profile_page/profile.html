@@ -3,72 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <title>profile</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
+<style>
+    .profile-img-wrapper{
+        position:relative;
+        width:120px;
+    }
+    .profile-img{
+        width:120px;
+        height:120px;
+        border-radius:50%;
+        background:#d9d9d9;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:60px;
+        color:#6c757d;
+    }
+    .icon-btn{
+        position:absolute;
+        bottom:0;
+        width:38px;
+        height:38px;
+        border-radius:50%;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:#fff;
+    }
+    .delete-btn{
+        left:-5px;
+        background:#dc3545;
+    }
+    .camera-btn{
+        right:-5px;
+        background:#212529;
+    }
+    span{
+        color: red;
+    }
+</style>
 <body>
     <div class="container p-5">
         <div class="card  py-4 px-3">
-            <!-- <nav class="bg-primary nav">
-                <div class="container my-2">
-                    <div class="row">
-                        <div class="col-6 bg-success">
-                            <div class="row">
-                                <div class="col-12 col-md-6 col-xl-6 bg-light p-3">
-                                    <div class="profile bg-dark"></div>
-                                    <i class="bi bi-brilliance"></i><img src="../assets/images/avatar/avatar-3.jpg" class="avatar-xl rounded-circle border border-4 border-white" alt="avatar" />
-                                    <div class="btn-group ">
-                                        <a href="" class="btn btn-danger rounded-circle position-absolute"><i class="bi bi-trash"></i></a>
-                                        <a href="" class="btn btn-dark rounded-circle position-absolute"><i class="bi bi-camera"></i></a>
-                                    </div>
+            <div class="row align-items-center">
+                <div class="col-12 col-sm-6 d-flex flex-column flex-sm-row align-items-center align-items-sm-start text-center text-sm-start">
+                    <div class="profile-img-wrapper mb-3 mb-sm-0 me-sm-3">
+                        <div class="profile-img">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div class="icon-btn delete-btn">
+                            <i class="bi bi-trash"></i>
+                        </div>
 
-                                </div> 
-                                <div class="col-12 col-md-6 col-xl-6 lh-1 title mt-5">
-                                    <h3 class="mb-0 fw-medium">
-                                        Siv Heng
-                                    </h3>
-                                    <p class="mb-0 d-block mt-2">sivheng@gmail.com</p>
-                                    <p class="mb-0 d-block mt-2">Profile picture saves automatically</p>
-                                </div>
-                            </div>
+                        <div class="icon-btn camera-btn">
+                            <i class="bi bi-camera"></i>
                         </div>
-                        <div class="col-6 bg-danger">
-                            <button class="btn btn-dark edit me-5" type="submit"><i class="bi bi-pencil me-2"></i>Edit Profile</button>
-                        </div>
-                    </div>   
-                </div>
-            </nav> -->
-            <div class="d-flex align-items-end justify-content-between">
-                <div class="d-flex align-items-center">
-                    <div class="me-2 position-relative bg-dark d-flex justify-content-end align-items-end mt-n5 profile rounded-circle">
-                        <img src="https://tse4.mm.bing.net/th/id/OIP.DJqmRcWAs9itMZR8g3biFAHaHa?rs=1&pid=ImgDetMain&o=7&rm=3" class="avatar-xl rounded-circle border border-4 border-white img-fluid" alt="avatar" />
                     </div>
-                    <div class="lh-1">
-                    <h2 class="mb-0">
-                        Siv Heng
-                    </h2>
-                    <p class="mb-0 d-block">sivheng@gmail.com</p>
-                    <p class="mb-0 d-block">Profile picture saves automatically</p>
+                    <div class="mt-sm-3">
+                        <h3 class="mb-1">Siv Heng</h3>
+                        <p class="mb-1 text-muted">sivheng@gmail.com</p>
+                        <small class="text-muted">Profile picture saves automatically</small>
                     </div>
                 </div>
-                <div>
-                    <a href="profile-edit.html" class="btn btn-primary btn-sm d-none d-md-block">Account Setting</a>
+                <div class="col-12 col-sm-6 text-center text-sm-end mt-3 mt-sm-0">
+                    <button class="btn btn-dark px-4" onclick="getEdit()">
+                    <i class="bi bi-pencil me-2"></i>Edit Profile
+                    </button>
                 </div>
             </div>
-            <form class="row g-3">
+            <form class="row g-3 mt-3" id="my-form">
                 <div class="col-md-6">
                     <label for="inputFirstName" class="form-label">First Name</label>
-                    <input type="text" class="form-control" placeholder="First name" aria-label="First name">
+                    <input type="text" id="fname" class="form-control" placeholder="First name" readonly="readonly">
+                    <span id="errorFname"></span>
                 </div>
                 <div class="col-md-6">
                     <label for="inputLastName" class="form-label">Last Name</label>
-                    <input type="text" class="form-control" placeholder="Last name" aria-label="Last name">                 
+                    <input type="text" id="lname" class="form-control" placeholder="Last name" readonly="readonly">                 
+                    <span id="errorLname"></span>
                 </div>
                 <div class="col-12">
                     <label for="inputEmail4" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="inputEmail4">
+                    <input type="email"  class="form-control" id="email" readonly="readonly">
+                    <span id="errorEmail"></span>
+                </div>
+                <div class="save d-none">
+                    <button type="submit" onclick="getSaves()" class="btn btn-dark"><i class="bi bi-check2 me-2" ></i>Save Changes</button>
+                    <button type="submit" class="btn btn-outline-dark">Cancel</button>
                 </div>
             </form>
         </div>
