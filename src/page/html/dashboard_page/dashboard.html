@@ -1,127 +1,281 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Blog Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <style>
-        :root {
-            --text-primary: #2d3436;
-            --text-secondary: #999;
-            --text-muted: #b8b8b8;
-            --sidebar-bg: #022a57;
-        }
+      :root {
+        --text-darkblue: #003879;
+        --bg-darkblue: #003879;
+        --sidebar-bg: #022a57;
+      }
 
-        body {
-            color: var(--text-primary);
-        }
+      html,
+      body {
+        font-family: "Sora", sans-serif !important;
+      }
 
-        /* Remove link underlines */
-        a {
-            text-decoration: none !important;
-        }
+      .text-darkblue {
+        color: var(--text-darkblue);
+      }
+      a {
+        text-decoration: none;
+      }
 
-        .btn-link {
-            text-decoration: none !important;
-        }
+      .bg-darkblue {
+        background-color: var(--bg-darkblue);
+      }
+      .bg-darkblue:hover {
+        background-color: #1bb864;
+      }
 
-        .btn-link:hover {
-            text-decoration: none !important;
-        }
+      .sidebar {
+        background-color: var(--sidebar-bg);
+      }
 
-        /* Sidebar styling */
+      /* Mobile sidebar */
+      @media (max-width: 991px) {
         .sidebar {
-            background-color: var(--sidebar-bg) !important;
+          position: fixed;
+          left: 0;
+          top: 0;
+          height: 100vh;
+          width: 260px;
+          transform: translateX(-100%);
+          transition: transform 0.3s ease;
+          z-index: 1050;
         }
 
-        /* Mobile sidebar slide animation */
-        @media (max-width: 991px) {
-            .sidebar {
-                position: fixed !important;
-                left: 0 !important;
-                top: 0 !important;
-                height: 100vh !important;
-                z-index: 1050 !important;
-                transform: translateX(-100%) !important;
-                transition: transform 0.3s ease !important;
-                width: 250px !important;
-                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2) !important;
-            }
-
-            .sidebar.show {
-                transform: translateX(0) !important;
-            }
-
-            .toggle-btn {
-                display: block !important;
-            }
+        .sidebar.show {
+          transform: translateX(0);
         }
+      }
+      /* ===== Skeleton Loader ===== */
+      .skeleton {
+        background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%);
+        background-size: 400% 100%;
+        animation: skeleton-loading 1.4s ease infinite;
+      }
+
+      @keyframes skeleton-loading {
+        0% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0 50%;
+        }
+      }
+
+      .skeleton-img {
+        height: 220px;
+        width: 100%;
+        border-radius: 6px;
+      }
+
+      .skeleton-text {
+        height: 14px;
+        width: 100%;
+        border-radius: 4px;
+        margin-bottom: 10px;
+      }
+
+      .skeleton-text.short {
+        width: 60%;
+      }
     </style>
-</head>
-<body class="bg-light">
+  </head>
+
+  <body class="bg-light">
     <div class="d-flex vh-100">
-        <!-- Sidebar -->
-        <nav class="text-white sidebar p-4 flex-shrink-0" id="sidebar" style="width: 260px; overflow-y: auto;">
-            <div class="h5 fw-bold mb-3 d-flex align-items-center">
-                <i class="fas fa-book me-2"></i>Blog
-            </div>
-            
-            <ul class="list-unstyled">
-                <li class="mb-2">
-                    <a href="#" class="btn btn-link text-white text-start w-100 d-flex align-items-center p-2 rounded nav-link" data-page="dashboard" style="background: rgba(255, 255, 255, 0.1);">
-                        <i class="fas fa-home me-2" style="width: 20px;"></i>Dashboard
-                    </a>
-                </li>
-                <li class="mb-2">
-                    <a href="#" class="btn btn-link text-white-50 text-start w-100 d-flex align-items-center p-2 rounded nav-link" data-page="article">
-                        <i class="fas fa-file-alt me-2" style="width: 20px;"></i>My Article
-                    </a>
-                </li>
-                <li class="mb-2">
-                    <a href="#" class="btn btn-link text-white-50 text-start w-100 d-flex align-items-center p-2 rounded nav-link" data-page="category">
-                        <i class="fas fa-list me-2" style="width: 20px;"></i>Category
-                    </a>
-                </li>
-                <li class="mb-2 ">
-                    <a href="#" class="btn btn-link text-danger text-start w-100 d-flex align-items-center p-2 rounded nav-link" data-page="logout">
-                        <i class="fas fa-sign-out-alt me-2" style="width: 20px;"></i>Logout
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-        <!-- Main Content -->
-        <div class="d-flex flex-column flex-grow-1">
-            <!-- Header -->
-            <header class="bg-white border-bottom py-3 px-4 d-flex align-items-center justify-content-between gap-3">
-                <div class="d-flex align-items-center gap-3">
-                    <button class="btn btn-primary d-md-none toggle-btn" id="toggleBtn">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h1 class="h3 fw-bold text-dark mb-0" id="pageTitle">All articles</h1>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                    <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold" style="width: 40px; height: 40px;">TT</div>
-                    <span class="d-none d-sm-inline small" style="color: var(--text-primary);">Tann Tongei</span>
-                </div>
-            </header>
-
-            <!-- // content area -->
-            <div class="flex-grow-1 overflow-y-auto p-4" id="contentArea">
-                <!-- Dashboard Page -->
-                <div id="page-dashboard" class="page-content">
-                    <div class="alert alert-info" role="alert">
-                        Dashboard content goes here
-                    </div>
-                </div>
-                <div id="page-article" class="page-content d-none"></div>
-                <div id="page-category" class="page-content d-none"></div>
-            </div>
+      <!-- Sidebar -->
+      <nav
+        id="sidebar"
+        class="sidebar text-white p-4 flex-shrink-0"
+        style="width: 260px; overflow-y: auto"
+      >
+        <div class="mb-4">
+          <img
+            src="../../../asset/images/ANT.png"
+            alt="Logo"
+            class="img-fluid w-75"
+          />
         </div>
+
+        <ul class="list-unstyled">
+          <li class="mb-2">
+            <a
+              href="#"
+              class="nav-link text-white d-flex align-items-center p-2 rounded"
+              data-page="dashboard"
+              style="background: rgba(255, 255, 255, 0.1)"
+            >
+              <i class="fas fa-home me-2"></i> Dashboard
+            </a>
+          </li>
+
+          <li class="mb-2">
+            <a
+              class="nav-link d-flex justify-content-between align-items-center p-2 rounded text-white-50"
+              data-bs-toggle="collapse"
+              href="#articleMenu"
+            >
+              <span> <i class="fas fa-file-alt me-2"></i> My Article </span>
+              <i class="fas fa-chevron-down article-chevron"></i>
+            </a>
+
+            <div class="collapse ps-3 mt-1" id="articleMenu">
+              <a
+                href="#"
+                class="nav-link text-white-50 p-2 rounded mb-1"
+                data-page="articleList"
+              >
+                All Article
+              </a>
+
+              <a
+                href="#"
+                class="nav-link text-white-50 p-2 rounded"
+                data-page="articleCreate"
+              >
+                Create Article
+              </a>
+            </div>
+          </li>
+
+          <li class="mb-2">
+            <a
+              href="#"
+              class="nav-link text-white-50 d-flex align-items-center p-2 rounded"
+              data-page="category"
+            >
+              <i class="fas fa-list me-2"></i> Category
+            </a>
+          </li>
+
+          <li class="mb-2">
+            <a
+              href="#"
+              class="nav-link text-danger d-flex align-items-center p-2 rounded"
+              data-page="logout"
+            >
+              <i class="fas fa-sign-out-alt me-2"></i> Logout
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Main -->
+      <div class="d-flex flex-column flex-grow-1">
+        <!-- Header -->
+        <header
+          class="bg-white border-bottom px-4 py-3 d-flex justify-content-between align-items-center"
+        >
+          <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-primary d-md-none" id="toggleBtn">
+              <i class="fas fa-bars"></i>
+            </button>
+
+            <h4 id="pageTitle" class="mb-0 fw-bold text-darkblue">Dashboard</h4>
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <div
+              class="rounded-circle bg-darkblue text-white d-flex align-items-center justify-content-center fw-bold"
+              style="width: 40px; height: 40px"
+            >
+              TT
+            </div>
+            <span class="d-none d-sm-inline">Tann Tongei</span>
+          </div>
+        </header>
+
+        <!-- Content -->
+        <main class="flex-grow-1 overflow-auto p-4">
+          <div id="dashboardtool" class="container-fluid px-0">
+            <div class="row">
+              <div class="col-6 mb-4">
+                <div class="form-control">
+                  <div class="d-flex align-items-center">
+                    <i class="fas fa-search text-secondary"></i>
+                    <input
+                      type="text"
+                      id="searchInput"
+                      class="form-control border-0 shadow-none"
+                      placeholder="Search articles..."
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="col-6 mb-4 d-flex justify-content-end">
+                <button
+                  id="createBtn"
+                  class="btn bg-darkblue text-white bg-hover-darkblue"
+                >
+                  <a
+                    href="#"
+                    class="nav-link"
+                    data-page="articleCreate"
+                    id="nav-create-article"
+                  >
+                    <i class="fas fa-plus-circle me-2"> </i>
+                    Create Article
+                  </a>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div id="page-dashboard" class="page-content">
+            <div id="article" class="row g-3"></div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+              <!-- Left: range info -->
+              <div id="rangeInfo" class="text-muted small">
+                Showing 0–0 of 0
+              </div>
+
+              <!-- Right: pagination controls -->
+              <div class="d-flex align-items-center gap-3">
+                <button id="prevBtn" class="btn btn-outline-secondary">
+                  Previous
+                </button>
+
+                <span id="pageInfo" class="fw-medium"> Page 1 of 1 </span>
+
+                <button id="nextBtn" class="btn bg-darkblue text-white">
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="page-articleList" class="page-content d-none"></div>
+          <div id="page-articleCreate" class="page-content d-none"></div>
+          <div id="page-category" class="page-content d-none"></div>
+        </main>
+      </div>
     </div>
+
+    <!-- Scripts -->
     <script src="../../scripts/dashboard_scripts/dashboard.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+  </body>
 </html>
