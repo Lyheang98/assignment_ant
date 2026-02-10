@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>profile</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+<style>
+    .profile-img-wrapper{
+        position:relative;
+        width:120px;
+    }
+    .profile-img{
+        width:120px;
+        height:120px;
+        border-radius:50%;
+        background:#d9d9d9;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:60px;
+        color:#6c757d;
+    }
+    .icon-btn{
+        position:absolute;
+        bottom:0;
+        width:38px;
+        height:38px;
+        border-radius:50%;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:#fff;
+    }
+    .delete-btn{
+        left:-5px;
+        background:#dc3545;
+    }
+    .camera-btn{
+        right:-5px;
+        background:#212529;
+    }
+    span{
+        color: red;
+    }
+</style>
+<body>
+    <div class="container p-5">
+        <div class="card  py-4 px-3">
+            <div class="row align-items-center">
+                <div class="col-12 col-sm-6 d-flex flex-column flex-sm-row align-items-center align-items-sm-start text-center text-sm-start">
+                    <div class="profile-img-wrapper mb-3 mb-sm-0 me-sm-3">
+                        <div class="profile-img">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div class="icon-btn delete-btn">
+                            <i class="bi bi-trash"></i>
+                        </div>
+
+                        <div class="icon-btn camera-btn">
+                            <i class="bi bi-camera"></i>
+                        </div>
+                    </div>
+                    <div class="mt-sm-3">
+                        <h3 class="mb-1">Siv Heng</h3>
+                        <p class="mb-1 text-muted">sivheng@gmail.com</p>
+                        <small class="text-muted">Profile picture saves automatically</small>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 text-center text-sm-end mt-3 mt-sm-0">
+                    <button class="btn btn-dark px-4" onclick="getEdit()">
+                    <i class="bi bi-pencil me-2"></i>Edit Profile
+                    </button>
+                </div>
+            </div>
+            <form class="row g-3 mt-3" id="my-form">
+                <div class="col-md-6">
+                    <label for="inputFirstName" class="form-label">First Name</label>
+                    <input type="text" id="fname" class="form-control" placeholder="First name" readonly="readonly">
+                    <span id="errorFname"></span>
+                </div>
+                <div class="col-md-6">
+                    <label for="inputLastName" class="form-label">Last Name</label>
+                    <input type="text" id="lname" class="form-control" placeholder="Last name" readonly="readonly">                 
+                    <span id="errorLname"></span>
+                </div>
+                <div class="col-12">
+                    <label for="inputEmail4" class="form-label">Email</label>
+                    <input type="email"  class="form-control" id="email" readonly="readonly">
+                    <span id="errorEmail"></span>
+                </div>
+                <div class="save d-none">
+                    <button type="submit" onclick="getSaves()" class="btn btn-dark"><i class="bi bi-check2 me-2" ></i>Save Changes</button>
+                    <button type="submit" class="btn btn-outline-dark">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="../../scripts/profile_scripts/profile.js"></script>
+</body>
+</html>
