@@ -28,21 +28,20 @@ const itemsPerPage = 6;
    PAGE CONFIG
 ===================================================== */
 const pageConfig = {
-  dashboard: { title: "Dashboard", file: "/dashboard" },
+  dashboard: { title: "Dashboard", file: null },
   articleList: {
     title: "Article List",
-    file: "/article-list",
+    file: "../article_page/article_list.html",
   },
   articleCreate: {
     title: "Create Article",
-    file: "/article-create",
+    file: "../article_page/article_create.html",
   },
   category: {
     title: "Category",
-    file: "/category",
+    file: "../category_page/category.html",
   },
 };
-
 
 /* =====================================================
    SIDEBAR NAVIGATION
@@ -104,8 +103,7 @@ toggleBtn.addEventListener("click", () => {
 function showSkeleton(count = 6) {
   articleList.innerHTML = "";
   for (let i = 0; i < count; i++) {
-    articleList.insertAdjacentHTML(
-      "beforeend",
+      let skeletoncard =
       `
       <div class="col-md-4 mb-4">
         <div class="card h-100 border rounded-3 overflow-hidden">
@@ -122,10 +120,11 @@ function showSkeleton(count = 6) {
             </div>
           </div>
         </div>
-      </div>
-      `
-    );
+      </div> `
+    ;
+    articleList.innerHTML += skeletoncard;
   }
+  
 }
 
 function renderWithSkeleton() {
