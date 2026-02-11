@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/src/page/html/auth_page/login.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/src/page/html/auth_page/login.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/src/page/html/dashboard_page/dashboard.html"
+    },
+    {
+      "source": "/profile",
+      "destination": "/src/page/html/profile_page/profile.html"
+    }
+  ]
+}

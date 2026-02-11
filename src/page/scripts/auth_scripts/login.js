@@ -90,8 +90,7 @@ const loginpage = (event) => {
         successvalidation.textContent = datalogin.message;
 
         setTimeout(() => {
-          window.location.href =
-            "../../html/dashboard_page/dashboard.html";
+         window.location.href = "/dashboard";
         }, 1500);
       } else {
         failedvalidation.textContent = datalogin.message;
