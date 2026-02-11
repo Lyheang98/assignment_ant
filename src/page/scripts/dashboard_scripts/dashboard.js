@@ -2,20 +2,50 @@
    ELEMENTS
 ===================================================== */
 const navLinks = document.querySelectorAll(".nav-link[data-page]");
-const pageTitle = document.getElementById("pageTitle");
-const pageContents = document.querySelectorAll(".page-content");
-const sidebar = document.getElementById("sidebar");
 const toggleBtn = document.getElementById("toggleBtn");
+const sidebar = document.getElementById("sidebar");
 
 const articleList = document.getElementById("article");
 const prevBtn = document.getElementById("prevBtn");
 const nextBtn = document.getElementById("nextBtn");
 const pageInfo = document.getElementById("pageInfo");
 const searchInput = document.getElementById("searchInput");
-const dashboardtoolbar = document.getElementById("dashboardtool");
-const createBtn = document.getElementById("createBtn");
 const rangeInfo = document.getElementById("rangeInfo");
+const createBtn = document.getElementById("createBtn");
 
+/* =====================================================
+   ROUTING CONFIG (CLEAN URLS)
+===================================================== */
+const pageRoutes = {
+  dashboard: "/dashboard",
+  articleList: "/article-list",
+  articleCreate: "/article-create",
+  category: "/category",
+  logout: "/login"
+};
+
+/* =====================================================
+   SIDEBAR NAVIGATION (REAL PAGE ROUTING)
+===================================================== */
+navLinks.forEach((link) => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const page = link.dataset.page;
+    const route = pageRoutes[page];
+
+    if (!route) return;
+
+    window.location.href = route;
+  });
+});
+
+/* =====================================================
+   SIDEBAR TOGGLE
+===================================================== */
+toggleBtn?.addEventListener("click", () => {
+  sidebar?.classList.toggle("show");
+});
 
 /* =====================================================
    STATE
@@ -25,84 +55,13 @@ let currentPage = 1;
 const itemsPerPage = 6;
 
 /* =====================================================
-   PAGE CONFIG
+   SKELETON LOADING
 ===================================================== */
-const pageConfig = {
-  dashboard: { title: "Dashboard", file: "/dashboard" },
-  articleList: {
-    title: "Article List",
-    file: "/article-list",
-  },
-  articleCreate: {
-    title: "Create Article",
-    file: "/article-create",
-  },
-  category: {
-    title: "Category",
-    file: "/category",
-  },
-};
-
-
-/* =====================================================
-   SIDEBAR NAVIGATION
-===================================================== */
-navLinks.forEach((link) => {
-  link.addEventListener("click", async (e) => {
-    e.preventDefault();
-    const page = link.dataset.page;
-
-    if (page === "logout") {
-      window.location.href = "../auth_page/logout.html";
-      return;
-    }
-
-    const config = pageConfig[page];
-    if (!config) return;
-
-    pageContents.forEach((p) => p.classList.add("d-none"));
-    const selectedPage = document.getElementById(`page-${page}`);
-    selectedPage.classList.remove("d-none");
-    pageTitle.textContent = config.title;
-    // ✅ Show toolbar only on dashboard
-    if (page === "dashboard") {
-      dashboardtoolbar?.classList.remove("d-none");
-    } else {
-      dashboardtoolbar?.classList.add("d-none");
-    }
-
-    navLinks.forEach((l) => {
-      l.classList.remove("text-white");
-      l.classList.add("text-white-50");
-      l.style.background = "transparent";
-    });
-
-    link.classList.add("text-white");
-    link.classList.remove("text-white-50");
-    link.style.background = "rgba(255,255,255,0.1)";
-
-    if (config.file) {
-      selectedPage.innerHTML = `<div class="p-3 text-muted">Loading...</div>`;
-      const res = await fetch(config.file);
-      const html = await res.text();
-      selectedPage.innerHTML = html
-        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-        .replace(/<link[^>]*>/gi, "")
-        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
-    }
-
-    if (window.innerWidth < 992) sidebar.classList.remove("show");
-  });
-});
-
-/* =====================================================
-   SIDEBAR TOGGLE
-===================================================== */
-toggleBtn.addEventListener("click", () => {
-  sidebar.classList.toggle("show");
-});
 function showSkeleton(count = 6) {
+  if (!articleList) return;
+
   articleList.innerHTML = "";
+
   for (let i = 0; i < count; i++) {
     articleList.insertAdjacentHTML(
       "beforeend",
@@ -128,38 +87,37 @@ function showSkeleton(count = 6) {
   }
 }
 
-function renderWithSkeleton() {
-  showSkeleton(itemsPerPage);
-  setTimeout(() => {
-    renderArticles();
-  }, 800);
-}
 /* =====================================================
    FETCH ARTICLES
 ===================================================== */
 const articleApi =
   "https://blogs2.csm.linkpc.net/api/v1/articles?search=&_page=1&_per_page=100";
+
+if (articleList) {
   showSkeleton(itemsPerPage);
 
-fetch(articleApi)
-  .then((res) => res.json())
-  .then((data) => {
-    allArticles = data.data.items || [];
-    renderArticles();
-  })
-  .catch(() => {
-    articleList.innerHTML = `<div class="alert alert-danger">Failed to load articles</div>`;
-  });
+  fetch(articleApi)
+    .then((res) => res.json())
+    .then((data) => {
+      allArticles = data.data.items || [];
+      renderArticles();
+    })
+    .catch(() => {
+      articleList.innerHTML =
+        `<div class="alert alert-danger">Failed to load articles</div>`;
+    });
+}
 
 /* =====================================================
-   RENDER (SEARCH + PAGINATION INSIDE)
+   RENDER ARTICLES (SEARCH + PAGINATION)
 ===================================================== */
 function renderArticles() {
+  if (!articleList) return;
+
   articleList.innerHTML = "";
 
-  const keyword = searchInput.value.toLowerCase().trim();
+  const keyword = searchInput?.value.toLowerCase().trim() || "";
 
-  // 1️⃣ FILTER
   const filtered = allArticles.filter((item) => {
     const firstName = item.creator?.firstName?.toLowerCase() || "";
     const lastName = item.creator?.lastName?.toLowerCase() || "";
@@ -176,9 +134,8 @@ function renderArticles() {
   const end = start + itemsPerPage;
   const pageArticles = filtered.slice(start, end);
 
-  // 3️⃣ RENDER
   pageArticles.forEach((item) => {
-    let cardarticle = `
+    const card = `
       <div class="col-md-4 mb-4">
         <div class="card h-100 border rounded-3 overflow-hidden">
           <img src="${item.thumbnail}" class="card-img-top" style="max-height:220px;object-fit:cover">
@@ -199,65 +156,63 @@ function renderArticles() {
                   ${item.creator?.firstName || ""} ${item.creator?.lastName || ""}
                 </span>
               </div>
-              <span class="text-muted small">ID: ${item.creator.id}</span>
+              <span class="text-muted small">ID: ${item.creator?.id || ""}</span>
             </div>
           </div>
         </div>
       </div>
-      `;
-    articleList.innerHTML += cardarticle;
+    `;
+
+    articleList.innerHTML += card;
   });
 
-
-  // 4️⃣ PAGINATION + RANGE INFO
   const totalItems = filtered.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
 
-  pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-  prevBtn.disabled = currentPage === 1;
-  nextBtn.disabled = currentPage === totalPages;
+  if (pageInfo) pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+  if (prevBtn) prevBtn.disabled = currentPage === 1;
+  if (nextBtn) nextBtn.disabled = currentPage === totalPages;
 
-  if (totalItems === 0) {
-    rangeInfo.textContent = "Showing 0–0 of 0";
-  } else {
-    const startItem = (currentPage - 1) * itemsPerPage + 1;
-    const endItem = Math.min(startItem + pageArticles.length - 1, totalItems);
-    rangeInfo.textContent = `Showing ${startItem}–${endItem} of ${totalItems}`;
+  if (rangeInfo) {
+    if (totalItems === 0) {
+      rangeInfo.textContent = "Showing 0–0 of 0";
+    } else {
+      const startItem = (currentPage - 1) * itemsPerPage + 1;
+      const endItem = Math.min(startItem + pageArticles.length - 1, totalItems);
+      rangeInfo.textContent = `Showing ${startItem}–${endItem} of ${totalItems}`;
+    }
   }
-
 }
 
 /* =====================================================
    SEARCH
 ===================================================== */
-searchInput.addEventListener("input", () => {
+searchInput?.addEventListener("input", () => {
   currentPage = 1;
-   renderWithSkeleton();
+  showSkeleton(itemsPerPage);
+  setTimeout(renderArticles, 500);
 });
 
 /* =====================================================
-   PAGINATION BUTTONS
+   PAGINATION
 ===================================================== */
-prevBtn.addEventListener("click", () => {
+prevBtn?.addEventListener("click", () => {
   if (currentPage > 1) {
     currentPage--;
-     renderWithSkeleton();
+    showSkeleton(itemsPerPage);
+    setTimeout(renderArticles, 500);
   }
 });
 
-nextBtn.addEventListener("click", () => {
+nextBtn?.addEventListener("click", () => {
   currentPage++;
-   renderWithSkeleton();
+  showSkeleton(itemsPerPage);
+  setTimeout(renderArticles, 500);
 });
 
-
+/* =====================================================
+   CREATE BUTTON
+===================================================== */
 createBtn?.addEventListener("click", () => {
-  const createLink = document.querySelector(
-    '.nav-link[data-page="articleCreate"]'
-  );
-
-  if (createLink) {
-    createLink.click(); 
-  }
+  window.location.href = "/article-create";
 });
-
