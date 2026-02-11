@@ -16,6 +16,8 @@ const dashboardtoolbar = document.getElementById("dashboardtool");
 const createBtn = document.getElementById("createBtn");
 const rangeInfo = document.getElementById("rangeInfo");
 
+const logoutModalEl = document.getElementById("logoutModal");
+const confirmLogoutBtn = document.getElementById("confirmLogout");
 
 /* =====================================================
    STATE
@@ -23,6 +25,13 @@ const rangeInfo = document.getElementById("rangeInfo");
 let allArticles = [];
 let currentPage = 1;
 const itemsPerPage = 6;
+
+
+
+confirmLogoutBtn?.addEventListener("click", () => {
+  localStorage.removeItem("token");
+  window.location.href = "../auth_page/login.html";
+});
 
 /* =====================================================
    PAGE CONFIG
@@ -51,25 +60,34 @@ navLinks.forEach((link) => {
     e.preventDefault();
     const page = link.dataset.page;
 
-    if (page === "logout") {
-      window.location.href = "../auth_page/logout.html";
-      return;
-    }
+    // 🔥 Handle Logout Separately
+ if (page === "logout") {
+  const modal = new bootstrap.Modal(
+    logoutModalEl
+  );
+  modal.show();
+  return;
+}
+
 
     const config = pageConfig[page];
     if (!config) return;
 
+    // Hide all pages
     pageContents.forEach((p) => p.classList.add("d-none"));
+
     const selectedPage = document.getElementById(`page-${page}`);
     selectedPage.classList.remove("d-none");
     pageTitle.textContent = config.title;
-    // ✅ Show toolbar only on dashboard
+
+    // Show toolbar only on dashboard
     if (page === "dashboard") {
       dashboardtoolbar?.classList.remove("d-none");
     } else {
       dashboardtoolbar?.classList.add("d-none");
     }
 
+    // Reset active style
     navLinks.forEach((l) => {
       l.classList.remove("text-white");
       l.classList.add("text-white-50");
@@ -80,31 +98,46 @@ navLinks.forEach((link) => {
     link.classList.remove("text-white-50");
     link.style.background = "rgba(255,255,255,0.1)";
 
+    // Load external page if exists
     if (config.file) {
-      selectedPage.innerHTML = `<div class="p-3 text-muted">Loading...</div>`;
-      const res = await fetch(config.file);
-      const html = await res.text();
-      selectedPage.innerHTML = html
-        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-        .replace(/<link[^>]*>/gi, "")
-        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
+      selectedPage.innerHTML =
+        `<div class="p-3 text-muted">Loading...</div>`;
+
+      try {
+        const res = await fetch(config.file);
+        const html = await res.text();
+
+        selectedPage.innerHTML = html
+          .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+          .replace(/<link[^>]*>/gi, "")
+          .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
+      } catch {
+        selectedPage.innerHTML =
+          `<div class="alert alert-danger">Failed to load page</div>`;
+      }
     }
 
-    if (window.innerWidth < 992) sidebar.classList.remove("show");
+    if (window.innerWidth < 992) {
+      sidebar.classList.remove("show");
+    }
   });
 });
 
 /* =====================================================
    SIDEBAR TOGGLE
 ===================================================== */
-toggleBtn.addEventListener("click", () => {
+toggleBtn?.addEventListener("click", () => {
   sidebar.classList.toggle("show");
 });
+
+/* =====================================================
+   SKELETON LOADER
+===================================================== */
 function showSkeleton(count = 6) {
   articleList.innerHTML = "";
+
   for (let i = 0; i < count; i++) {
-      let skeletoncard =
-      `
+    articleList.innerHTML += `
       <div class="col-md-4 mb-4">
         <div class="card h-100 border rounded-3 overflow-hidden">
           <div class="skeleton skeleton-img"></div>
@@ -113,56 +146,47 @@ function showSkeleton(count = 6) {
             <div class="skeleton skeleton-text"></div>
             <div class="skeleton skeleton-text"></div>
           </div>
-          <div class="card-footer bg-white border-top">
-            <div class="d-flex align-items-center gap-3">
-              <div class="skeleton rounded-circle" style="width:40px;height:40px;"></div>
-              <div class="skeleton skeleton-text short"></div>
-            </div>
-          </div>
         </div>
-      </div> `
-    ;
-    articleList.innerHTML += skeletoncard;
+      </div>`;
   }
-  
 }
 
 function renderWithSkeleton() {
   showSkeleton(itemsPerPage);
-  setTimeout(() => {
-    renderArticles();
-  }, 800);
+  setTimeout(renderArticles, 600);
 }
+
 /* =====================================================
    FETCH ARTICLES
 ===================================================== */
 const articleApi =
   "https://blogs2.csm.linkpc.net/api/v1/articles?search=&_page=1&_per_page=100";
-  showSkeleton(itemsPerPage);
+
+showSkeleton(itemsPerPage);
 
 fetch(articleApi)
   .then((res) => res.json())
   .then((data) => {
-    allArticles = data.data.items || [];
+    allArticles = data.data?.items || [];
     renderArticles();
   })
   .catch(() => {
-    articleList.innerHTML = `<div class="alert alert-danger">Failed to load articles</div>`;
+    articleList.innerHTML =
+      `<div class="alert alert-danger">Failed to load articles</div>`;
   });
 
 /* =====================================================
-   RENDER (SEARCH + PAGINATION INSIDE)
+   RENDER ARTICLES
 ===================================================== */
 function renderArticles() {
   articleList.innerHTML = "";
 
   const keyword = searchInput.value.toLowerCase().trim();
 
-  // 1️⃣ FILTER
   const filtered = allArticles.filter((item) => {
-    const firstName = item.creator?.firstName?.toLowerCase() || "";
-    const lastName = item.creator?.lastName?.toLowerCase() || "";
-    const fullName = `${firstName} ${lastName}`;
+    const fullName =
+      `${item.creator?.firstName || ""} ${item.creator?.lastName || ""}`
+        .toLowerCase();
 
     return (
       item.title?.toLowerCase().includes(keyword) ||
@@ -171,46 +195,69 @@ function renderArticles() {
     );
   });
 
-  const start = (currentPage - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  const pageArticles = filtered.slice(start, end);
-
-  // 3️⃣ RENDER
-  pageArticles.forEach((item) => {
-    let cardarticle = `
-      <div class="col-md-4 mb-4">
-        <div class="card h-100 border rounded-3 overflow-hidden">
-          <img src="${item.thumbnail}" class="card-img-top" style="max-height:220px;object-fit:cover">
-          <div class="card-body">
-            <span class="badge bg-primary mb-2">${item.category}</span>
-            <h5 class="text-darkblue">${item.title}</h5>
-            <p class="text-darkblue">${item.content.slice(0,120)}...</p>
-          </div>
-          <div class="card-footer bg-white border-top">
-            <div class="d-flex align-items-center justify-content-between">
-              <div class="d-flex align-items-center gap-3">
-                <img
-                  src="${item.creator?.avatar || 'https://via.placeholder.com/40'}"
-                  class="rounded-circle"
-                  style="width:40px;height:40px;object-fit:cover"
-                />
-                <span class="fw-semibold text-darkblue">
-                  ${item.creator?.firstName || ""} ${item.creator?.lastName || ""}
-                </span>
-              </div>
-              <span class="text-muted small">ID: ${item.creator.id}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      `;
-    articleList.innerHTML += cardarticle;
-  });
-
-
-  // 4️⃣ PAGINATION + RANGE INFO
   const totalItems = filtered.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const start = (currentPage - 1) * itemsPerPage;
+  const pageArticles = filtered.slice(start, start + itemsPerPage);
+
+  pageArticles.forEach((item) => {
+    articleList.innerHTML += `
+      <div class="col-md-4 mb-4">
+  <div class="card h-100 border rounded-3 overflow-hidden">
+
+    <!-- Thumbnail -->
+    <img src="${item.thumbnail}" 
+         class="card-img-top"
+         style="max-height:220px;object-fit:cover">
+
+    <!-- Body -->
+    <div class="card-body">
+      <span class="badge bg-primary mb-2">
+        ${item.category}
+      </span>
+
+      <h5 class="text-darkblue fw-semibold">
+        ${item.title}
+      </h5>
+
+      <p class="text-muted">
+        ${item.content.slice(0,120)}...
+      </p>
+    </div>
+
+    <!-- Footer (Avatar Section) -->
+    <div class="card-footer bg-white border-top">
+      <div class="d-flex align-items-center justify-content-between">
+
+        <!-- Left: Avatar + Name -->
+        <div class="d-flex align-items-center gap-2">
+          <img 
+            src="${item.creator?.avatar || 'https://via.placeholder.com/40'}"
+            class="rounded-circle"
+            style="width:40px;height:40px;object-fit:cover"
+          />
+
+          <div class="d-flex flex-column">
+            <span class="fw-semibold text-darkblue small">
+              ${item.creator?.firstName || ""} 
+              ${item.creator?.lastName || ""}
+            </span>
+            <span class="text-muted small">
+              ID: ${item.creator?.id || "-"}
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+`;
+  });
 
   pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
   prevBtn.disabled = currentPage === 1;
@@ -219,44 +266,39 @@ function renderArticles() {
   if (totalItems === 0) {
     rangeInfo.textContent = "Showing 0–0 of 0";
   } else {
-    const startItem = (currentPage - 1) * itemsPerPage + 1;
-    const endItem = Math.min(startItem + pageArticles.length - 1, totalItems);
-    rangeInfo.textContent = `Showing ${startItem}–${endItem} of ${totalItems}`;
+    rangeInfo.textContent =
+      `Showing ${start + 1}–${start + pageArticles.length} of ${totalItems}`;
   }
-
 }
 
 /* =====================================================
    SEARCH
 ===================================================== */
-searchInput.addEventListener("input", () => {
+searchInput?.addEventListener("input", () => {
   currentPage = 1;
-   renderWithSkeleton();
+  renderWithSkeleton();
 });
 
 /* =====================================================
-   PAGINATION BUTTONS
+   PAGINATION
 ===================================================== */
-prevBtn.addEventListener("click", () => {
+prevBtn?.addEventListener("click", () => {
   if (currentPage > 1) {
     currentPage--;
-     renderWithSkeleton();
+    renderWithSkeleton();
   }
 });
 
-nextBtn.addEventListener("click", () => {
+nextBtn?.addEventListener("click", () => {
   currentPage++;
-   renderWithSkeleton();
+  renderWithSkeleton();
 });
 
-
+/* =====================================================
+   CREATE BUTTON
+===================================================== */
 createBtn?.addEventListener("click", () => {
-  const createLink = document.querySelector(
-    '.nav-link[data-page="articleCreate"]'
-  );
-
-  if (createLink) {
-    createLink.click(); 
-  }
+  document
+    .querySelector('.nav-link[data-page="articleCreate"]')
+    ?.click();
 });
-
