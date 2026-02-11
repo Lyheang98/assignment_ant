@@ -28,20 +28,21 @@ const itemsPerPage = 6;
    PAGE CONFIG
 ===================================================== */
 const pageConfig = {
-  dashboard: { title: "Dashboard", file: null },
+  dashboard: { title: "Dashboard", file: "/dashboard" },
   articleList: {
     title: "Article List",
-    file: "../article_page/article_list.html",
+    file: "/article-list",
   },
   articleCreate: {
     title: "Create Article",
-    file: "../article_page/article_create.html",
+    file: "/article-create",
   },
   category: {
     title: "Category",
-    file: "../category_page/category.html",
+    file: "/category",
   },
 };
+
 
 /* =====================================================
    SIDEBAR NAVIGATION
