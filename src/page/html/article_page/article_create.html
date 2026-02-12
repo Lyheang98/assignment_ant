@@ -5,6 +5,7 @@
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>article create</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     
     <style>
@@ -28,6 +29,9 @@
       /* textarea {
         resize: vertical;
       } */
+      span{
+        color: red;
+      }
     </style>
   
   </head>
@@ -38,24 +42,26 @@
 
       <h2 class="mb-4">Article Create</h2>
 
-      <form action="#" method="POST" enctype="multipart/form-data">
+      <form id="my-form" enctype="multipart/form-data">
         <div class="mb-3">
           <label for="title" class="form-label">
             Title <span class="text-danger">*</span>
           </label>
-          <input type="text" id="title" name="title" class="form-control" required>
+          <input type="text" id="title" name="title" class="form-control">
+          <span id="titleError"></span>
         </div>
 
         <div class="mb-3">
           <label for="category" class="form-label">
             Category <span class="text-danger">*</span>
           </label>
-          <select id="category" name="category" class="form-select" required>
+          <select id="category" name="category" class="form-select" >
             <option value="" selected disabled>Select category</option>
             <option value="technology">Technology</option>
             <option value="education">Education</option>
             <option value="business">Business</option>
           </select>
+          <span id="categoryError"></span>
         </div>
 
           <div class="mb-3">
@@ -69,16 +75,16 @@
             <label for="content" class="form-label">
               Content <span class="text-danger">*</span>
             </label>
-            <textarea id="content" name="content" class="form-control" rows="8" placeholder="Write content here..." required></textarea>
+            <textarea id="content" name="content" class="form-control" rows="8" placeholder="Write content here..."></textarea>
           </div>
+          <span id="contentError"></span>
 
           <div class="d-flex justify-content-between">
-            <a href="#" class="btn btn-outline-secondary">
+            <a href="article_list.html" class="btn btn-outline-secondary">
               ← Back to Articles
-               
             </a>
-            <button type="submit" class="btn btn-publish">
-              ✈️ Publish Now
+            <button type="submit" class="btn btn-publish" onclick="getPublish()">
+              <i class="bi bi-telegram"></i> Publish Now
             </button>
           </div>
       </form>
@@ -86,5 +92,7 @@
 
       
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+    <script src="../../scripts/article_scripts/article_create.js"></script>
   </body>
 </html>
