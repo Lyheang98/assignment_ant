@@ -1,6 +1,4 @@
-/* =====================================================
-   ELEMENTS
-===================================================== */
+//
 const navLinks = document.querySelectorAll(".nav-link[data-page]");
 const pageTitle = document.getElementById("pageTitle");
 const pageContents = document.querySelectorAll(".page-content");
@@ -19,75 +17,72 @@ const rangeInfo = document.getElementById("rangeInfo");
 const logoutModalEl = document.getElementById("logoutModal");
 const confirmLogoutBtn = document.getElementById("confirmLogout");
 
-/* =====================================================
-   STATE
-===================================================== */
+// declare array to store from api
 let allArticles = [];
 let currentPage = 1;
 const itemsPerPage = 6;
 
-
-
+// logout comfirm ( mean that logout is direct to login and roemove token )
 confirmLogoutBtn?.addEventListener("click", () => {
   localStorage.removeItem("token");
-  window.location.href = "../auth_page/login.html";
+  window.location.href =
+    "/src/page/html/auth_page/login.html";
 });
 
-/* =====================================================
-   PAGE CONFIG
-===================================================== */
 const pageConfig = {
   dashboard: { title: "Dashboard", file: null },
   articleList: {
     title: "Article List",
-    file: "../article_page/article_list.html",
+    file: "/src/page/html/article_page/article_list.html",
   },
   articleCreate: {
     title: "Create Article",
-    file: "../article_page/article_create.html",
+    file: "/src/page/html/article_page/article_create.html",
   },
   category: {
     title: "Category",
-    file: "../category_page/category.html",
+    file: "/src/page/html/category_page/category.html",
   },
 };
 
-/* =====================================================
-   SIDEBAR NAVIGATION
-===================================================== */
+
+
+//
 navLinks.forEach((link) => {
   link.addEventListener("click", async (e) => {
     e.preventDefault();
+    // dataset is get value of data-page
     const page = link.dataset.page;
 
-    // 🔥 Handle Logout Separately
- if (page === "logout") {
-  const modal = new bootstrap.Modal(
-    logoutModalEl
-  );
-  modal.show();
-  return;
-}
+    // handle modal when click logout sidebar
+    if (page === "logout") {
+      const modal = new bootstrap.Modal(logoutModalEl);
+      modal.show();
+      return;
+    }
 
-
+    // get value navlink-page in pageconfig and store in config varaible 
     const config = pageConfig[page];
-    if (!config) return;
-
-    // Hide all pages
+    // Hide pages first
     pageContents.forEach((p) => p.classList.add("d-none"));
 
+    // it get the uniqe id of each page store in selectedpage variable
     const selectedPage = document.getElementById(`page-${page}`);
+    // show page when click
     selectedPage.classList.remove("d-none");
+    // list the title of page from value of all page that store in config variable
     pageTitle.textContent = config.title;
 
-    // Show toolbar only on dashboard
+    // Show toolbar only on dashboard 
     if (page === "dashboard") {
+      // it mean show toolbar only dashboard page
       dashboardtoolbar?.classList.remove("d-none");
     } else {
+      // mean that we another page is hide the toolbar
       dashboardtoolbar?.classList.add("d-none");
     }
 
-    // Reset active style
+    // Reset active style for navlink
     navLinks.forEach((l) => {
       l.classList.remove("text-white");
       l.classList.add("text-white-50");
@@ -100,21 +95,24 @@ navLinks.forEach((link) => {
 
     // Load external page if exists
     if (config.file) {
-      selectedPage.innerHTML =
-        `<div class="p-3 text-muted">Loading...</div>`;
+      selectedPage.innerHTML = `<div class="p-3 text-muted">Loading...</div>`;
 
-      try {
-        const res = await fetch(config.file);
-        const html = await res.text();
-
-        selectedPage.innerHTML = html
+      // Use fetch becuase to request the file from the config becuase the page file route is in the variable we need to use fetch to request
+      fetch(config.file)
+        .then((res) => res.text())
+        .then((html) => {
+          selectedPage.innerHTML = html
+          // replace the javascripts link style from external to prevent overide style in dashboard-page
           .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
           .replace(/<link[^>]*>/gi, "")
           .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
-      } catch {
-        selectedPage.innerHTML =
-          `<div class="alert alert-danger">Failed to load page</div>`;
-      }
+        })
+        .catch(() => {
+          selectedPage.innerHTML = `
+        <div class="alert alert-danger">
+          Failed to load page
+        </div>`;
+        });
     }
 
     if (window.innerWidth < 992) {
@@ -123,16 +121,13 @@ navLinks.forEach((link) => {
   });
 });
 
-/* =====================================================
-   SIDEBAR TOGGLE
-===================================================== */
+// handle toggle btn show when phone screen
 toggleBtn?.addEventListener("click", () => {
   sidebar.classList.toggle("show");
 });
 
-/* =====================================================
-   SKELETON LOADER
-===================================================== */
+
+// render skeleton 
 function showSkeleton(count = 6) {
   articleList.innerHTML = "";
 
@@ -150,20 +145,18 @@ function showSkeleton(count = 6) {
       </div>`;
   }
 }
-
+// render skeleton in a page 
 function renderWithSkeleton() {
   showSkeleton(itemsPerPage);
   setTimeout(renderArticles, 600);
 }
 
-/* =====================================================
-   FETCH ARTICLES
-===================================================== */
+// fetch to get all article
 const articleApi =
   "https://blogs2.csm.linkpc.net/api/v1/articles?search=&_page=1&_per_page=100";
-
+// render skeleton before fetching
 showSkeleton(itemsPerPage);
-
+// start fetch from api using fetch method
 fetch(articleApi)
   .then((res) => res.json())
   .then((data) => {
@@ -171,8 +164,7 @@ fetch(articleApi)
     renderArticles();
   })
   .catch(() => {
-    articleList.innerHTML =
-      `<div class="alert alert-danger">Failed to load articles</div>`;
+    articleList.innerHTML = `<div class="alert alert-danger">Failed to load articles</div>`;
   });
 
 /* =====================================================
@@ -185,8 +177,7 @@ function renderArticles() {
 
   const filtered = allArticles.filter((item) => {
     const fullName =
-      `${item.creator?.firstName || ""} ${item.creator?.lastName || ""}`
-        .toLowerCase();
+      `${item.creator?.firstName || ""} ${item.creator?.lastName || ""}`.toLowerCase();
 
     return (
       item.title?.toLowerCase().includes(keyword) ||
@@ -224,7 +215,7 @@ function renderArticles() {
       </h5>
 
       <p class="text-muted">
-        ${item.content.slice(0,120)}...
+        ${item.content.slice(0, 120)}...
       </p>
     </div>
 
@@ -235,7 +226,7 @@ function renderArticles() {
         <!-- Left: Avatar + Name -->
         <div class="d-flex align-items-center gap-2">
           <img 
-            src="${item.creator?.avatar || 'https://via.placeholder.com/40'}"
+            src="${item.creator?.avatar || "https://via.placeholder.com/40"}"
             class="rounded-circle"
             style="width:40px;height:40px;object-fit:cover"
           />
@@ -266,22 +257,15 @@ function renderArticles() {
   if (totalItems === 0) {
     rangeInfo.textContent = "Showing 0–0 of 0";
   } else {
-    rangeInfo.textContent =
-      `Showing ${start + 1}–${start + pageArticles.length} of ${totalItems}`;
+    rangeInfo.textContent = `Showing ${start + 1}–${start + pageArticles.length} of ${totalItems}`;
   }
 }
 
-/* =====================================================
-   SEARCH
-===================================================== */
 searchInput?.addEventListener("input", () => {
   currentPage = 1;
   renderWithSkeleton();
 });
 
-/* =====================================================
-   PAGINATION
-===================================================== */
 prevBtn?.addEventListener("click", () => {
   if (currentPage > 1) {
     currentPage--;
@@ -294,11 +278,6 @@ nextBtn?.addEventListener("click", () => {
   renderWithSkeleton();
 });
 
-/* =====================================================
-   CREATE BUTTON
-===================================================== */
 createBtn?.addEventListener("click", () => {
-  document
-    .querySelector('.nav-link[data-page="articleCreate"]')
-    ?.click();
+  document.querySelector('.nav-link[data-page="articleCreate"]')?.click();
 });

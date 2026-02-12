@@ -3,9 +3,7 @@ const baseurl = "https://blogs2.csm.linkpc.net/api/v1/auth/login";
 const loginBtn = document.getElementById("login");
 const spinner = document.getElementById("loginSpinner");
 
-/* =====================================================
-   SPINNER HELPERS (GLOBAL & CLEAN)
-===================================================== */
+
 const showLoading = () => {
   loginBtn.disabled = true;
   spinner.classList.remove("d-none");
@@ -16,9 +14,7 @@ const hideLoading = () => {
   spinner.classList.add("d-none");
 };
 
-/* =====================================================
-   RESET SPINNER ON PAGE LOAD (IMPORTANT)
-===================================================== */
+
 document.addEventListener("DOMContentLoaded", () => {
   hideLoading();
 
@@ -75,7 +71,7 @@ const loginpage = (event) => {
   // ❗ DO NOT SHOW SPINNER IF INVALID
   if (!isValid) return;
 
-  // ✅ Show spinner ONLY when validation passes
+
   showLoading();
 
   fetch(baseurl, {
@@ -90,17 +86,16 @@ const loginpage = (event) => {
         successvalidation.textContent = datalogin.message;
 
         setTimeout(() => {
-          window.location.href =
-            "../../html/dashboard_page/dashboard.html";
+          window.location.href = "/src/page/html/dashboard_page/dashboard.html";
         }, 1500);
       } else {
         failedvalidation.textContent = datalogin.message;
-        hideLoading(); // ✅ stop spinner on failed login
+        hideLoading(); 
       }
     })
     .catch((err) => {
       console.error("Network error:", err);
       failedvalidation.textContent = "Cannot connect to server";
-      hideLoading(); // ✅ stop spinner on error
+      hideLoading(); 
     });
 };
