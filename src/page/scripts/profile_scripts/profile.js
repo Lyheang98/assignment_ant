@@ -127,6 +127,20 @@ const renderProfile = (user) => {
   `;
 
   attachEvents();
+  // Update dropdown info
+// Update navbar dropdown info
+const navAvatar = document.getElementById("navAvatar");
+const navUsername = document.getElementById("navUsername");
+
+if (navAvatar) {
+  navAvatar.src = user.avatar || "https://via.placeholder.com/32";
+}
+
+if (navUsername) {
+  navUsername.textContent = `${user.firstName} ${user.lastName} `;
+}
+
+
 };
 
 
@@ -232,6 +246,5 @@ const showProfileAlert = (message, type = "success") => {
     `
   );
 };
-
 
 loadProfile();

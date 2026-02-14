@@ -165,14 +165,19 @@
 
         <div class="d-flex align-items-center gap-2">
           <div class="dropdown">
-            <a class="btn dropdown-toggle " role="button" data-bs-toggle="dropdown">
-              <i class="" id="userpf"></i>
+            <a class="btn dropdown-toggle d-flex align-items-center gap-2" role="button" data-bs-toggle="dropdown">
+
+              <img id="navAvatar" src="" class="rounded-circle" style="width:32px;height:32px;object-fit:cover">
+
+              <span id="navUsername" class="fw-semibold text-darkblue"></span>
+
             </a>
+
             <ul class="dropdown-menu p-2">
 
               <li>
                 <a href="#" class="dropdown-item nav-link p-2" data-page="profile">
-                  <i class="fas fa-user me-2 "></i> Profile
+                  <i class="fas fa-user me-2"></i> Profile
                 </a>
               </li>
 
@@ -181,15 +186,14 @@
               </li>
 
               <li>
-                <a href="#" class="dropdown-item text-danger p-2 rounded" data-page="logout">
+                <a href="#" class="dropdown-item nav-link text-danger p-2" data-page="logout">
                   <i class="fas fa-sign-out-alt me-2"></i> Logout
                 </a>
               </li>
 
             </ul>
-
-
           </div>
+
       </header>
 
       <!-- CONTENT -->
