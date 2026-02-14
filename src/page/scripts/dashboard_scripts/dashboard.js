@@ -29,19 +29,36 @@ const itemsPerPage = 6;
 // ================================
 // LOGOUT
 // ================================
-confirmLogoutBtn.addEventListener("click", () => {
+confirmLogoutBtn?.addEventListener("click", () => {
   localStorage.removeItem("token");
   window.location.href = "../auth_page/login.html";
 });
 
 // ================================
-// SIDEBAR NAVIGATION (SPA)
+// ARTICLE CHEVRON TOGGLE
 // ================================
-navLinks.forEach(link => {
+const articleMenu = document.getElementById("articleMenu");
+const articleChevron = document.querySelector(".article-chevron");
+
+if (articleMenu && articleChevron) {
+  articleMenu.addEventListener("show.bs.collapse", () => {
+    articleChevron.classList.replace("fa-chevron-down", "fa-chevron-up");
+  });
+
+  articleMenu.addEventListener("hide.bs.collapse", () => {
+    articleChevron.classList.replace("fa-chevron-up", "fa-chevron-down");
+  });
+}
+
+// ================================
+// SPA NAVIGATION
+// ================================
+navLinks.forEach((link) => {
   link.addEventListener("click", (e) => {
     e.preventDefault();
 
     const page = link.dataset.page;
+    if (!page) return;
 
     // Logout
     if (page === "logout") {
@@ -50,30 +67,34 @@ navLinks.forEach(link => {
     }
 
     // Hide all pages
-    pageContents.forEach(p => p.classList.add("d-none"));
+    pageContents.forEach((p) => p.classList.add("d-none"));
 
-    // Show selected
-    document.getElementById(`page-${page}`)?.classList.remove("d-none");
+    // Show selected page
+    const selectedPage = document.getElementById(`page-${page}`);
+    selectedPage?.classList.remove("d-none");
 
     // Update title
     pageTitle.textContent = link.innerText.trim();
 
-    // Show toolbar only on dashboard
+    // Show dashboard toolbar only on dashboard
     dashboardToolbar.classList.toggle("d-none", page !== "dashboard");
 
-    // Load dashboard again
+    // Page initializations
     if (page === "dashboard") initDashboard();
 
-    // Init category
     if (page === "category" && window.initCategory) {
       window.initCategory();
     }
 
+    if (page === "profile" && typeof loadProfile === "function") {
+      loadProfile();
+    }
+
     // Active style
-    navLinks.forEach(l => l.classList.remove("active"));
+    navLinks.forEach((l) => l.classList.remove("active"));
     link.classList.add("active");
 
-    // Close mobile sidebar
+    // Close sidebar on mobile
     if (window.innerWidth < 992) sidebar.classList.remove("show");
   });
 });
@@ -81,7 +102,7 @@ navLinks.forEach(link => {
 // ================================
 // MOBILE SIDEBAR
 // ================================
-toggleBtn.addEventListener("click", () => {
+toggleBtn?.addEventListener("click", () => {
   sidebar.classList.toggle("show");
 });
 
@@ -95,8 +116,8 @@ function initDashboard() {
   showSkeleton();
 
   fetch(articleApi)
-    .then(res => res.json())
-    .then(data => {
+    .then((res) => res.json())
+    .then((data) => {
       allArticles = data.data?.items || [];
       renderArticles();
     })
@@ -107,7 +128,7 @@ function initDashboard() {
 }
 
 // ================================
-// SKELETON
+// SKELETON LOADER
 // ================================
 function showSkeleton() {
   articleList.innerHTML = "";
@@ -133,9 +154,9 @@ function showSkeleton() {
 function renderArticles() {
   articleList.innerHTML = "";
 
-  const keyword = searchInput.value.toLowerCase().trim();
+  const keyword = searchInput?.value.toLowerCase().trim() || "";
 
-  const filtered = allArticles.filter(item => {
+  const filtered = allArticles.filter((item) => {
     const fullName =
       `${item.creator?.firstName || ""} ${item.creator?.lastName || ""}`.toLowerCase();
 
@@ -152,18 +173,21 @@ function renderArticles() {
   const start = (currentPage - 1) * itemsPerPage;
   const pageItems = filtered.slice(start, start + itemsPerPage);
 
-  pageItems.forEach(item => {
+  pageItems.forEach((item) => {
     articleList.innerHTML += `
       <div class="col-md-4 mb-4">
         <div class="card h-100">
 
-          <img src="${item.thumbnail}" class="card-img-top"
+          <img src="${item.thumbnail}"
+               class="card-img-top"
                style="max-height:220px;object-fit:cover">
 
           <div class="card-body">
             <span class="badge bg-primary mb-2">${item.category}</span>
             <h5 class="fw-semibold text-darkblue">${item.title}</h5>
-            <p class="text-muted">${item.content.slice(0,120)}...</p>
+            <p class="text-muted">
+              ${item.content?.slice(0, 120) || ""}...
+            </p>
           </div>
 
           <div class="card-footer bg-white">
@@ -199,28 +223,32 @@ function renderArticles() {
 // ================================
 // SEARCH & PAGINATION
 // ================================
-searchInput.addEventListener("input", () => {
+searchInput?.addEventListener("input", () => {
   currentPage = 1;
   renderArticles();
 });
 
-prevBtn.addEventListener("click", () => {
+prevBtn?.addEventListener("click", () => {
   if (currentPage > 1) {
     currentPage--;
     renderArticles();
   }
 });
 
-nextBtn.addEventListener("click", () => {
-  currentPage++;
-  renderArticles();
+nextBtn?.addEventListener("click", () => {
+  if (currentPage * itemsPerPage < allArticles.length) {
+    currentPage++;
+    renderArticles();
+  }
 });
 
-createBtn.addEventListener("click", () => {
+createBtn?.addEventListener("click", () => {
   document.querySelector('[data-page="articleCreate"]')?.click();
 });
 
 // ================================
 // DEFAULT LOAD
 // ================================
-document.addEventListener("DOMContentLoaded", initDashboard);
+document.addEventListener("DOMContentLoaded", () => {
+  initDashboard();
+});
