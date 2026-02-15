@@ -1,4 +1,9 @@
 // ================================
+// CONFIG
+// ================================
+const BASE_URL = "https://blogs2.csm.linkpc.net/api/v1";
+
+// ================================
 // ELEMENTS
 // ================================
 const navLinks = document.querySelectorAll(".nav-link[data-page]");
@@ -29,26 +34,11 @@ const itemsPerPage = 6;
 // ================================
 // LOGOUT
 // ================================
+
 confirmLogoutBtn?.addEventListener("click", () => {
   localStorage.removeItem("token");
   window.location.href = "../auth_page/login.html";
 });
-
-// ================================
-// ARTICLE CHEVRON TOGGLE
-// ================================
-const articleMenu = document.getElementById("articleMenu");
-const articleChevron = document.querySelector(".article-chevron");
-
-if (articleMenu && articleChevron) {
-  articleMenu.addEventListener("show.bs.collapse", () => {
-    articleChevron.classList.replace("fa-chevron-down", "fa-chevron-up");
-  });
-
-  articleMenu.addEventListener("hide.bs.collapse", () => {
-    articleChevron.classList.replace("fa-chevron-up", "fa-chevron-down");
-  });
-}
 
 // ================================
 // SPA NAVIGATION
@@ -71,31 +61,45 @@ navLinks.forEach((link) => {
 
     // Show selected page
     const selectedPage = document.getElementById(`page-${page}`);
-    selectedPage?.classList.remove("d-none");
+    if (!selectedPage) {
+      console.error(`page-${page} not found`);
+      return;
+    }
+
+    selectedPage.classList.remove("d-none");
 
     // Update title
     pageTitle.textContent = link.innerText.trim();
 
-    // Show dashboard toolbar only on dashboard
-    dashboardToolbar.classList.toggle("d-none", page !== "dashboard");
+    // Show toolbar only on dashboard
+    dashboardToolbar?.classList.toggle("d-none", page !== "dashboard");
 
-    // Page initializations
-    if (page === "dashboard") initDashboard();
+    // Initialize pages
+    if (page === "dashboard") {
+      initDashboard();
+    }
 
-    if (page === "category" && window.initCategory) {
-      window.initCategory();
+    if (page === "category" && typeof initCategory === "function") {
+      initCategory();
     }
 
     if (page === "profile" && typeof loadProfile === "function") {
       loadProfile();
     }
 
+    if (page === "articleCreate" && typeof renderCreateForm === "function") {
+      renderCreateForm();
+    }
+
+    
     // Active style
     navLinks.forEach((l) => l.classList.remove("active"));
     link.classList.add("active");
 
     // Close sidebar on mobile
-    if (window.innerWidth < 992) sidebar.classList.remove("show");
+    if (window.innerWidth < 992) {
+      sidebar?.classList.remove("show");
+    }
   });
 });
 
@@ -103,14 +107,13 @@ navLinks.forEach((link) => {
 // MOBILE SIDEBAR
 // ================================
 toggleBtn?.addEventListener("click", () => {
-  sidebar.classList.toggle("show");
+  sidebar?.classList.toggle("show");
 });
 
 // ================================
 // DASHBOARD DATA
 // ================================
-const articleApi =
-  "https://blogs2.csm.linkpc.net/api/v1/articles?search=&_page=1&_per_page=100";
+const articleApi = `${BASE_URL}/articles?search=&_page=1&_per_page=100`;
 
 function initDashboard() {
   showSkeleton();
@@ -119,6 +122,7 @@ function initDashboard() {
     .then((res) => res.json())
     .then((data) => {
       allArticles = data.data?.items || [];
+      currentPage = 1;
       renderArticles();
     })
     .catch(() => {
@@ -131,6 +135,8 @@ function initDashboard() {
 // SKELETON LOADER
 // ================================
 function showSkeleton() {
+  if (!articleList) return;
+
   articleList.innerHTML = "";
 
   for (let i = 0; i < itemsPerPage; i++) {
@@ -152,6 +158,8 @@ function showSkeleton() {
 // RENDER ARTICLES
 // ================================
 function renderArticles() {
+  if (!articleList) return;
+
   articleList.innerHTML = "";
 
   const keyword = searchInput?.value.toLowerCase().trim() || "";
@@ -183,7 +191,6 @@ function renderArticles() {
                style="max-height:220px;object-fit:cover">
 
           <div class="card-body">
-            <span class="badge bg-primary mb-2">${item.category}</span>
             <h5 class="fw-semibold text-darkblue">${item.title}</h5>
             <p class="text-muted">
               ${item.content?.slice(0, 120) || ""}...
@@ -236,10 +243,8 @@ prevBtn?.addEventListener("click", () => {
 });
 
 nextBtn?.addEventListener("click", () => {
-  if (currentPage * itemsPerPage < allArticles.length) {
-    currentPage++;
-    renderArticles();
-  }
+  currentPage++;
+  renderArticles();
 });
 
 createBtn?.addEventListener("click", () => {
@@ -250,5 +255,5 @@ createBtn?.addEventListener("click", () => {
 // DEFAULT LOAD
 // ================================
 document.addEventListener("DOMContentLoaded", () => {
-  initDashboard();
+  document.querySelector('[data-page="dashboard"]')?.click();
 });

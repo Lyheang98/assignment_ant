@@ -1,14 +1,18 @@
-const BASE_URL = "https://blogs2.csm.linkpc.net/api/v1";
+// ================= GLOBAL =================
 const token = localStorage.getItem("token");
 const profileContainer = document.getElementById("profileContainer");
 
+if (!token) {
+  window.location.href = "../auth_page/login.html";
+}
 
 // ================= LOAD PROFILE =================
 const loadProfile = async () => {
+
   profileContainer.innerHTML = `
     <div class="text-center p-5">
       <div class="spinner-border text-darkblue"></div>
-      <div class="text-darkblue mt-2">Please wait while working...</div>
+      <div class="text-darkblue mt-2">Loading profile...</div>
     </div>
   `;
 
@@ -20,24 +24,22 @@ const loadProfile = async () => {
     const data = await res.json();
 
     if (!data.result) {
-      profileContainer.innerHTML = `
-        <div class="alert alert-danger">${data.message}</div>
-      `;
+      profileContainer.innerHTML =
+        `<div class="alert alert-danger">${data.message}</div>`;
       return;
     }
 
     renderProfile(data.data);
 
-  } catch (err) {
-    profileContainer.innerHTML = `
-      <div class="alert alert-danger">Failed to load profile</div>
-    `;
+  } catch {
+    profileContainer.innerHTML =
+      `<div class="alert alert-danger">Failed to load profile</div>`;
   }
 };
 
-
 // ================= RENDER =================
 const renderProfile = (user) => {
+
   profileContainer.innerHTML = `
     <div class="card shadow-sm p-4">
 
@@ -46,7 +48,7 @@ const renderProfile = (user) => {
         <div class="d-flex align-items-center gap-4">
 
           <div class="position-relative">
-            <img src="${user.avatar}"
+            <img src="${user.avatar || "https://via.placeholder.com/130"}"
                  class="rounded-circle"
                  style="width:130px;height:130px;object-fit:cover">
 
@@ -105,7 +107,7 @@ const renderProfile = (user) => {
 
           <div class="col-12">
             <label class="form-label">User ID</label>
-            <input type="number" id="id"
+            <input type="number"
               class="form-control"
               value="${user.id}" disabled>
           </div>
@@ -116,8 +118,7 @@ const renderProfile = (user) => {
           <button type="submit" class="btn btn-dark me-2">
             <i class="fas fa-save me-1"></i> Save Changes
           </button>
-          <button type="button" onclick="loadProfile()"
-            class="btn btn-secondary">
+          <button type="button" class="btn btn-secondary" id="cancelBtn">
             Cancel
           </button>
         </div>
@@ -126,45 +127,34 @@ const renderProfile = (user) => {
     </div>
   `;
 
+  updateNavbarInfo(user);
   attachEvents();
-  // Update dropdown info
-// Update navbar dropdown info
-const navAvatar = document.getElementById("navAvatar");
-const navUsername = document.getElementById("navUsername");
-
-if (navAvatar) {
-  navAvatar.src = user.avatar || "https://via.placeholder.com/32";
-}
-
-if (navUsername) {
-  navUsername.textContent = `${user.firstName} ${user.lastName} `;
-}
-
-
 };
 
+// ================= UPDATE NAVBAR =================
+function updateNavbarInfo(user) {
+  const navAvatar = document.getElementById("navAvatar");
+  const navUsername = document.getElementById("navUsername");
+
+  if (navAvatar) {
+    navAvatar.src = user.avatar || "https://via.placeholder.com/32";
+  }
+
+  if (navUsername) {
+    navUsername.textContent = `${user.firstName} ${user.lastName}`;
+  }
+}
 
 // ================= EVENTS =================
 const attachEvents = () => {
+
   const editBtn = document.getElementById("editBtn");
-  const inputs = document.querySelectorAll("#profileForm input");
+  const inputs = document.querySelectorAll("#profileForm input:not([type=number])");
   const actionButtons = document.getElementById("actionButtons");
   const form = document.getElementById("profileForm");
   const avatarInput = document.getElementById("avatarInput");
   const deleteBtn = document.getElementById("deleteAvatarBtn");
-
-  const deleteModalEl = document.getElementById("profileDeleteModal");
-  const confirmDeleteBtn = document.getElementById("confirmDeleteAvatar");
-  const deleteModal = new bootstrap.Modal(deleteModalEl);
-
-  // Open modal
-  deleteBtn.addEventListener("click", () => deleteModal.show());
-
-  // Confirm delete
-  confirmDeleteBtn.addEventListener("click", async () => {
-    await deleteAvatar();
-    deleteModal.hide();
-  });
+  const cancelBtn = document.getElementById("cancelBtn");
 
   // Enable edit
   editBtn.addEventListener("click", () => {
@@ -172,9 +162,16 @@ const attachEvents = () => {
     actionButtons.classList.remove("d-none");
   });
 
-  // Update profile
+  // Cancel edit
+  cancelBtn.addEventListener("click", loadProfile);
+
+  // ================= UPDATE PROFILE =================
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName = document.getElementById("lastName").value.trim();
+    const email = document.getElementById("email").value.trim();
 
     const res = await fetch(`${BASE_URL}/profile`, {
       method: "PUT",
@@ -182,24 +179,18 @@ const attachEvents = () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        firstName: firstName.value,
-        lastName: lastName.value,
-        email: email.value,
-      }),
+      body: JSON.stringify({ firstName, lastName, email }),
     });
 
     const data = await res.json();
 
-    if (data.result) {
-      loadProfile();
-    } else {
-      showProfileAlert(data.message, "danger");
-    }
+    if (data.result) loadProfile();
+    else showProfileAlert(data.message, "danger");
   });
 
-  // Upload avatar
+  // ================= UPLOAD AVATAR =================
   avatarInput.addEventListener("change", async () => {
+
     const file = avatarInput.files[0];
     if (!file) return;
 
@@ -208,8 +199,24 @@ const attachEvents = () => {
 
     const res = await fetch(`${BASE_URL}/profile/avatar`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
       body: formData,
+    });
+
+    const data = await res.json();
+
+    if (data.result) loadProfile();
+    else showProfileAlert(data.message, "danger");
+  });
+
+  // ================= DELETE AVATAR =================
+  deleteBtn.addEventListener("click", async () => {
+
+    const res = await fetch(`${BASE_URL}/profile/avatar`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     const data = await res.json();
@@ -219,23 +226,9 @@ const attachEvents = () => {
   });
 };
 
-
-// ================= DELETE =================
-const deleteAvatar = async () => {
-  const res = await fetch(`${BASE_URL}/profile/avatar`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  const data = await res.json();
-
-  if (data.result) loadProfile();
-  else showProfileAlert(data.message, "danger");
-};
-
-
-// ================= ALERT HELPER =================
+// ================= ALERT =================
 const showProfileAlert = (message, type = "success") => {
+
   profileContainer.insertAdjacentHTML(
     "afterbegin",
     `
@@ -247,4 +240,5 @@ const showProfileAlert = (message, type = "success") => {
   );
 };
 
+// ================= INITIAL LOAD =================
 loadProfile();
