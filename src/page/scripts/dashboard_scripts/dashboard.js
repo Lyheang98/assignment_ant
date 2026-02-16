@@ -91,7 +91,11 @@ navLinks.forEach((link) => {
       renderCreateForm();
     }
 
-    
+    if (page === "articleList" && typeof initArticleList === "function") {
+      initArticleList();
+    }
+
+
     // Active style
     navLinks.forEach((l) => l.classList.remove("active"));
     link.classList.add("active");
@@ -126,8 +130,7 @@ function initDashboard() {
       renderArticles();
     })
     .catch(() => {
-      articleList.innerHTML =
-        `<div class="alert alert-danger">Failed to load articles</div>`;
+      articleList.innerHTML = `<div class="alert alert-danger">Failed to load articles</div>`;
     });
 }
 
