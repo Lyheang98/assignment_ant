@@ -1,4 +1,4 @@
-// ================= GLOBAL =================
+
 const token = localStorage.getItem("token");
 const profileContainer = document.getElementById("profileContainer");
 

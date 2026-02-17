@@ -1,8 +1,6 @@
 const articlecreate = document.getElementById("articlecontainer");
 
-// =============================
-// RENDER FORM
-// =============================
+// render form 
 const messageModal = new bootstrap.Modal(
   document.getElementById("messageModal"),
 );
@@ -114,9 +112,7 @@ function renderCreateForm() {
 
 window.renderCreateForm = renderCreateForm;
 
-// =============================
-// LOAD CATEGORIES
-// =============================
+// load category
 async function loadCategories() {
   const token = localStorage.getItem("token");
 
@@ -146,9 +142,7 @@ async function loadCategories() {
 }
 
 
-// =============================
-// HANDLE SUBMIT
-// =============================
+// handle submit
 function handleSubmit() {
   document
     .getElementById("articleForm")

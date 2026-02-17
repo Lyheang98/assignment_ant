@@ -1,11 +1,8 @@
-// ================================
-// CONFIG
-// ================================
+// global baseurl
 const BASE_URL = "https://blogs2.csm.linkpc.net/api/v1";
 
-// ================================
-// ELEMENTS
-// ================================
+
+
 const navLinks = document.querySelectorAll(".nav-link[data-page]");
 const pageTitle = document.getElementById("pageTitle");
 const pageContents = document.querySelectorAll(".page-content");
@@ -24,25 +21,19 @@ const rangeInfo = document.getElementById("rangeInfo");
 const logoutModalEl = document.getElementById("dashboardLogoutModal");
 const confirmLogoutBtn = document.getElementById("confirmLogout");
 
-// ================================
-// STATE
-// ================================
+// state
 let allArticles = [];
 let currentPage = 1;
 const itemsPerPage = 6;
 
-// ================================
-// LOGOUT
-// ================================
+// log out button
 
 confirmLogoutBtn?.addEventListener("click", () => {
   localStorage.removeItem("token");
   window.location.href = "../auth_page/login.html";
 });
 
-// ================================
-// SPA NAVIGATION
-// ================================
+// navigation for all page sidebar
 navLinks.forEach((link) => {
   link.addEventListener("click", (e) => {
     e.preventDefault();
@@ -107,16 +98,12 @@ navLinks.forEach((link) => {
   });
 });
 
-// ================================
-// MOBILE SIDEBAR
-// ================================
+// mobile sidebar
 toggleBtn?.addEventListener("click", () => {
   sidebar?.classList.toggle("show");
 });
 
-// ================================
-// DASHBOARD DATA
-// ================================
+// dashboard data 
 const articleApi = `${BASE_URL}/articles?search=&_page=1&_per_page=100`;
 
 function initDashboard() {
@@ -134,9 +121,7 @@ function initDashboard() {
     });
 }
 
-// ================================
-// SKELETON LOADER
-// ================================
+// skeleton 
 function showSkeleton() {
   if (!articleList) return;
 
@@ -157,9 +142,7 @@ function showSkeleton() {
   }
 }
 
-// ================================
-// RENDER ARTICLES
-// ================================
+// render aritcle by search item title / content / fullname
 function renderArticles() {
   if (!articleList) return;
 
@@ -232,9 +215,7 @@ function renderArticles() {
       : `Showing ${start + 1}–${start + pageItems.length} of ${filtered.length}`;
 }
 
-// ================================
-// SEARCH & PAGINATION
-// ================================
+// search and navigation
 searchInput?.addEventListener("input", () => {
   currentPage = 1;
   renderArticles();
@@ -256,9 +237,7 @@ createBtn?.addEventListener("click", () => {
   document.querySelector('[data-page="articleCreate"]')?.click();
 });
 
-// ================================
-// DEFAULT LOAD
-// ================================
+// default load when login 
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelector('[data-page="dashboard"]')?.click();
 });
