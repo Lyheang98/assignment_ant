@@ -14,9 +14,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
-// ==========================================
-// ARTICLE LIST CORE LOGIC (FIXED)
-// ==========================================
+
 let ownArticles = [];
 
 // 1. Initialize and ensure it's globally accessible
@@ -79,10 +77,6 @@ function renderOwnArticlesTable(data) {
         `;
     });
 
-    const rangeDisplay = document.getElementById("rangeInfo");
-    if (rangeDisplay) {
-        rangeDisplay.textContent = `Showing 1–${ownArticles.length} of ${data?.total_items || ownArticles.length}`;
-    }
 }
 
 // 4. Open edit modal

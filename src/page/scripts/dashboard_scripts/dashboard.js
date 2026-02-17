@@ -167,6 +167,8 @@ function renderArticles() {
 
   const keyword = searchInput?.value.toLowerCase().trim() || "";
 
+
+  // filter item by title / content / fullname use filter
   const filtered = allArticles.filter((item) => {
     const fullName =
       `${item.creator?.firstName || ""} ${item.creator?.lastName || ""}`.toLowerCase();
